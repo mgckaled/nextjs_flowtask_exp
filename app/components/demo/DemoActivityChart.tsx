@@ -13,9 +13,9 @@ export default function DemoActivityChart({ data }: { data: number[] }) {
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6, delay: 0.2 }}
-      className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900"
+      className="rounded-lg border border-border bg-card p-6"
     >
-      <h3 className="mb-6 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+      <h3 className="mb-6 text-xl font-semibold text-card-foreground">
         Atividade da Semana
       </h3>
 

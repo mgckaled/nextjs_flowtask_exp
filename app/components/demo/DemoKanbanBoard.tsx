@@ -54,12 +54,12 @@ function TaskCard({
       whileHover={{ y: -2, boxShadow: '0 10px 15px -3px rgba(0,0,0,0.1)' }}
       draggable
       onDragStart={onDragStart}
-      className={`cursor-grab rounded-lg border-l-4 bg-white p-4 active:cursor-grabbing dark:bg-zinc-900 ${priorityColors[task.priority]}`}
+      className={`cursor-grab rounded-lg border-l-4 bg-card p-4 active:cursor-grabbing ${priorityColors[task.priority]}`}
     >
-      <h4 className="mb-2 font-semibold text-zinc-900 dark:text-zinc-100">
+      <h4 className="mb-2 font-semibold text-card-foreground">
         {task.title}
       </h4>
-      <p className="mb-3 text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="mb-3 text-sm text-muted-foreground">
         {task.description}
       </p>
       <div className="flex items-center justify-between">
@@ -108,7 +108,7 @@ export default function DemoKanbanBoard({
         viewport={{ once: true }}
         className="mb-4 flex items-center justify-between"
       >
-        <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100">
+        <h2 className="text-3xl font-bold text-card-foreground">
           Organize Tarefas Visualmente
         </h2>
         <span className="text-sm text-zinc-500 dark:text-zinc-500">
@@ -139,7 +139,7 @@ export default function DemoKanbanBoard({
               <div className="mb-4 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <column.icon className="h-5 w-5 text-blue-600 dark:text-blue-500" />
-                  <h3 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
+                  <h3 className="text-lg font-semibold text-card-foreground">
                     {column.title}
                   </h3>
                 </div>

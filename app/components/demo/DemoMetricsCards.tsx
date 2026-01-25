@@ -66,7 +66,7 @@ function MetricCard({
         visible: { opacity: 1, y: 0 },
       }}
       whileHover={{ y: -4, transition: { duration: 0.2 } }}
-      className="rounded-lg border border-zinc-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-900"
+      className="rounded-lg border border-border bg-card p-6 shadow-sm transition-shadow hover:shadow-lg"
     >
       <Icon className="mb-3 h-10 w-10 text-blue-600 dark:text-blue-500" />
       <motion.div
@@ -76,12 +76,12 @@ function MetricCard({
           opacity: [1, 0.8, 1],
         }}
         transition={{ duration: 0.3 }}
-        className="mb-2 text-4xl font-bold text-zinc-900 dark:text-zinc-100"
+        className="mb-2 text-4xl font-bold text-card-foreground"
       >
         {animatedValue}
         {suffix}
       </motion.div>
-      <div className="text-sm text-zinc-600 dark:text-zinc-400">{label}</div>
+      <div className="text-sm text-muted-foreground">{label}</div>
     </motion.div>
   )
 }

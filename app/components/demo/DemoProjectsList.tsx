@@ -30,9 +30,9 @@ export default function DemoProjectsList({ projects }: { projects: Project[] }) 
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
       transition={{ duration: 0.6 }}
-      className="rounded-lg border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900"
+      className="rounded-lg border border-border bg-card p-6"
     >
-      <h3 className="mb-6 text-xl font-semibold text-zinc-900 dark:text-zinc-100">
+      <h3 className="mb-6 text-xl font-semibold text-card-foreground">
         Seus Projetos
       </h3>
 
@@ -50,11 +50,11 @@ export default function DemoProjectsList({ projects }: { projects: Project[] }) 
                 <div
                   className={`h-3 w-3 rounded-full ${colorClasses[project.color as keyof typeof colorClasses] || colorClasses.blue}`}
                 />
-                <span className="font-medium text-zinc-900 dark:text-zinc-100">
+                <span className="font-medium text-card-foreground">
                   {project.name}
                 </span>
               </div>
-              <span className="text-sm text-zinc-600 dark:text-zinc-400">
+              <span className="text-sm text-muted-foreground">
                 {project.progress}%
               </span>
             </div>

@@ -22,7 +22,7 @@ export default function DemoHero({ onReset }: { onReset: () => void }) {
             initial={{ opacity: 0, y: -30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, ease: 'easeOut' }}
-            className="text-4xl font-bold text-zinc-900 dark:text-zinc-100 md:text-5xl lg:text-6xl"
+            className="text-4xl font-bold text-foreground md:text-5xl lg:text-6xl"
           >
             Experimente o FlowTask em Ação
           </motion.h1>
@@ -31,7 +31,7 @@ export default function DemoHero({ onReset }: { onReset: () => void }) {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.7, delay: 0.3 }}
-            className="mx-auto mt-6 max-w-3xl text-lg text-zinc-600 dark:text-zinc-400 md:text-xl"
+            className="mx-auto mt-6 max-w-3xl text-lg text-muted-foreground md:text-xl"
           >
             Interaja com nossa demo completa. Arraste tarefas, marque itens como
             concluídos e veja como FlowTask simplifica a gestão do seu time.
@@ -47,7 +47,7 @@ export default function DemoHero({ onReset }: { onReset: () => void }) {
               onClick={onReset}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="inline-flex items-center gap-2 rounded-lg bg-zinc-100 px-4 py-2 text-sm font-medium text-zinc-900 transition-colors hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700"
+              className="inline-flex items-center gap-2 rounded-lg bg-muted px-4 py-2 text-sm font-medium text-foreground transition-colors hover:opacity-80"
             >
               <svg
                 className="h-4 w-4"
