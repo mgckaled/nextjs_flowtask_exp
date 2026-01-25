@@ -3,13 +3,26 @@
 import { useSession, signIn } from 'next-auth/react'
 import { motion } from 'motion/react'
 import UserButton from './UserButton'
+import ThemeToggle from './ThemeToggle'
 
 export default function Header() {
   const { data: session, status } = useSession()
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
-      <div className="container mx-auto px-4 md:px-8">
+    <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md">
+      <div className="container mx-auto px-4 md:px-8 border-b border-border relative">
+        {/* Linha animada vibrante */}
+        <motion.div
+          className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"
+          animate={{
+            x: ['-100%', '100%'],
+          }}
+          transition={{
+            duration: 3,
+            repeat: Infinity,
+            ease: 'linear',
+          }}
+        />
         <div className="flex h-16 items-center justify-between">
           {/* Logo */}
           <motion.div
@@ -35,6 +48,7 @@ export default function Header() {
             transition={{ duration: 0.3 }}
             className="flex items-center gap-3"
           >
+            <ThemeToggle />
             {status === 'loading' ? (
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />

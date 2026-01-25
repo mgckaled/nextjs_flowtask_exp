@@ -14,7 +14,7 @@ import FeatureCard from './FeatureCard'
 export default function HomePageContent() {
   const { data: session } = useSession()
   return (
-    <div className="relative min-h-screen bg-white dark:bg-zinc-950">
+    <div className="relative min-h-screen bg-background">
       <AnimatedBackground />
 
       <div className="relative z-10">
@@ -26,7 +26,7 @@ export default function HomePageContent() {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
-                className="text-5xl font-bold text-zinc-900 dark:text-zinc-100 md:text-6xl lg:text-7xl"
+                className="text-5xl font-bold text-foreground md:text-6xl lg:text-7xl"
               >
                 Gerencie Projetos com Inteligência e Simplicidade
               </motion.h1>
@@ -35,7 +35,7 @@ export default function HomePageContent() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.2 }}
-                className="mx-auto mt-6 max-w-3xl text-lg text-zinc-600 dark:text-zinc-400 md:text-xl"
+                className="mx-auto mt-6 max-w-3xl text-lg text-muted-foreground md:text-xl"
               >
                 FlowTask é a plataforma completa para gestão de projetos e tarefas.
                 Organize seu time, acompanhe o progresso e alcance seus objetivos com eficiência.
@@ -60,7 +60,7 @@ export default function HomePageContent() {
                   <motion.div
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    className="inline-flex items-center justify-center rounded-lg border border-zinc-300 bg-transparent px-8 py-3 text-base font-medium text-zinc-900 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-900"
+                    className="inline-flex items-center justify-center rounded-lg border border-border bg-transparent px-8 py-3 text-base font-medium text-foreground transition-colors hover:bg-muted"
                   >
                     Ver Demonstração
                   </motion.div>
@@ -78,7 +78,7 @@ export default function HomePageContent() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
-              className="mb-12 text-center text-3xl font-bold text-zinc-900 dark:text-zinc-100 md:text-4xl"
+              className="mb-12 text-center text-3xl font-bold text-foreground md:text-4xl"
             >
               Tudo que você precisa em um só lugar
             </motion.h2>
@@ -125,7 +125,7 @@ export default function HomePageContent() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
-              className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 md:text-4xl"
+              className="text-3xl font-bold text-foreground md:text-4xl"
             >
               Pronto para aumentar sua produtividade?
             </motion.h2>
@@ -135,7 +135,7 @@ export default function HomePageContent() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="mx-auto mt-4 max-w-2xl text-lg text-zinc-600 dark:text-zinc-400"
+              className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground"
             >
               Junte-se a milhares de equipes que já transformaram sua forma de trabalhar.
             </motion.p>

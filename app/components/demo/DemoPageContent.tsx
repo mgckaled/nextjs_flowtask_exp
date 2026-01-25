@@ -199,7 +199,7 @@ export default function DemoPageContent() {
   }, [tasks])
 
   return (
-    <div className="relative min-h-screen bg-white dark:bg-zinc-950">
+    <div className="relative min-h-screen bg-background">
       <AnimatedBackground />
 
       <div className="relative z-10">
@@ -233,7 +233,7 @@ export default function DemoPageContent() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
-              className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 md:text-4xl"
+              className="text-3xl font-bold text-foreground md:text-4xl"
             >
               Gostou da Demonstração?
             </motion.h2>
@@ -243,7 +243,7 @@ export default function DemoPageContent() {
               whileInView={{ opacity: 1 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.2 }}
-              className="mx-auto mt-4 max-w-2xl text-lg text-zinc-600 dark:text-zinc-400"
+              className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground"
             >
               Comece gratuitamente hoje e transforme a forma como sua equipe
               trabalha. Sem cartão de crédito necessário.
@@ -267,7 +267,7 @@ export default function DemoPageContent() {
 
               <Link
                 href="/pricing"
-                className="inline-flex items-center justify-center rounded-lg border border-zinc-300 bg-transparent px-8 py-3 text-base font-medium text-zinc-900 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-100 dark:hover:bg-zinc-900"
+                className="inline-flex items-center justify-center rounded-lg border border-border bg-transparent px-8 py-3 text-base font-medium text-foreground transition-colors hover:bg-muted"
               >
                 Ver Planos e Preços
               </Link>

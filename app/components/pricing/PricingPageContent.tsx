@@ -5,7 +5,7 @@ import PricingCard from './PricingCard'
 
 export default function PricingPageContent() {
   return (
-    <div className="min-h-screen bg-white dark:bg-zinc-950 py-16 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-background py-16 px-4 sm:px-6 lg:px-8">
       <div className="mx-auto max-w-7xl">
         {/* Cabeçalho da Página */}
         <motion.div
@@ -14,11 +14,11 @@ export default function PricingPageContent() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: 'easeOut' }}
         >
-          <h1 className="text-4xl font-bold text-zinc-900 dark:text-zinc-100 sm:text-5xl">
+          <h1 className="text-4xl font-bold text-foreground sm:text-5xl">
             Escolha seu plano
           </h1>
           <motion.p
-            className="mt-4 text-lg text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto"
+            className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.2 }}

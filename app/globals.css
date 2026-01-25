@@ -1,26 +1,67 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+@theme {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* Cores do tema - referenciando variáveis CSS */
+  --color-background: var(--bg);
+  --color-foreground: var(--fg);
+  --color-card: var(--card-bg);
+  --color-card-foreground: var(--card-fg);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-fg);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-fg);
+  --color-muted: var(--muted-bg);
+  --color-muted-foreground: var(--muted-fg);
+  --color-accent: var(--accent-bg);
+  --color-accent-foreground: var(--accent-fg);
+  --color-border: var(--border-color);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Light mode (padrão) */
+:root {
+  --bg: #faf9fb;
+  --fg: #2d1b3d;
+  --card-bg: #ffffff;
+  --card-fg: #2d1b3d;
+  --primary: #9333ea;
+  --primary-fg: #ffffff;
+  --secondary: #ec4899;
+  --secondary-fg: #ffffff;
+  --muted-bg: #f3f4f6;
+  --muted-fg: #6b7280;
+  --accent-bg: #ede9fe;
+  --accent-fg: #581c87;
+  --border-color: #e9d5ff;
+}
+
+/* Dark mode */
+[data-theme="dark"] {
+  --bg: #18181b;
+  --fg: #f4f4f5;
+  --card-bg: #27272a;
+  --card-fg: #f4f4f5;
+  --primary: #a855f7;
+  --primary-fg: #ffffff;
+  --secondary: #f472b6;
+  --secondary-fg: #ffffff;
+  --muted-bg: #27272a;
+  --muted-fg: #a1a1aa;
+  --accent-bg: #3f3f46;
+  --accent-fg: #e9d5ff;
+  --border-color: #3f3f46;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: var(--bg);
+  color: var(--fg);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+button {
+  cursor: pointer;
 }

@@ -37,18 +37,18 @@ export default function PricingCard({
 
   // Estilos baseados na variante
   const borderStyle = {
-    default: 'border-zinc-200 dark:border-zinc-800',
+    default: 'border-border',
     popular: 'border-blue-500 dark:border-blue-600 ring-2 ring-blue-500/50',
-    premium: 'border-zinc-300 dark:border-zinc-700',
+    premium: 'border-border',
   }
 
   const buttonStyle = {
     default:
-      'border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 hover:bg-zinc-100 dark:hover:bg-zinc-800',
+      'border border-border text-foreground hover:bg-muted',
     popular:
       'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700',
     premium:
-      'bg-zinc-900 text-white hover:bg-zinc-800 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-200',
+      'bg-foreground text-background hover:opacity-90',
   }
 
   return (
@@ -58,7 +58,7 @@ export default function PricingCard({
       viewport={{ once: true, margin: '-50px' }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
       whileHover={{ y: -8, transition: { duration: 0.2 } }}
-      className={`relative flex flex-col rounded-lg border bg-white dark:bg-zinc-950 p-8 shadow-sm transition-shadow hover:shadow-lg ${borderStyle[variant]}`}
+      className={`relative flex flex-col rounded-lg border bg-card p-8 shadow-sm transition-shadow hover:shadow-lg ${borderStyle[variant]}`}
     >
       {/* Badge Popular */}
       {isPopular && (
@@ -84,10 +84,10 @@ export default function PricingCard({
 
       {/* Cabeçalho do Card */}
       <div className="mb-6">
-        <h3 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+        <h3 className="text-2xl font-bold text-card-foreground">
           {name}
         </h3>
-        <p className="mt-2 text-base text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-base text-muted-foreground">
           {description}
         </p>
       </div>
@@ -95,10 +95,10 @@ export default function PricingCard({
       {/* Preço */}
       <div className="mb-6">
         <div className="flex items-baseline">
-          <span className="text-5xl font-bold text-zinc-900 dark:text-zinc-100">
+          <span className="text-5xl font-bold text-card-foreground">
             {price}
           </span>
-          <span className="ml-2 text-lg text-zinc-600 dark:text-zinc-400">
+          <span className="ml-2 text-lg text-muted-foreground">
             {period}
           </span>
         </div>
@@ -139,7 +139,7 @@ export default function PricingCard({
             className="flex items-start gap-3"
           >
             <CheckIcon className="h-6 w-6 shrink-0 text-blue-600 dark:text-blue-500" />
-            <span className="text-base text-zinc-700 dark:text-zinc-300">
+            <span className="text-base text-card-foreground">
               {feature}
             </span>
           </motion.li>
