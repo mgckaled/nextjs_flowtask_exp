@@ -1,0 +1,65 @@
+'use client'
+
+import { useSession, signIn } from 'next-auth/react'
+import { motion } from 'framer-motion'
+import UserButton from './UserButton'
+
+export default function Header() {
+  const { data: session, status } = useSession()
+
+  return (
+    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/80 backdrop-blur-md">
+      <div className="container mx-auto px-4 md:px-8">
+        <div className="flex h-16 items-center justify-between">
+          {/* Logo */}
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex items-center gap-2"
+          >
+            <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-linear-to-br from-purple-600 to-pink-600">
+              <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+              FlowTask
+            </span>
+          </motion.div>
+
+          {/* Auth Buttons */}
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.3 }}
+            className="flex items-center gap-3"
+          >
+            {status === 'loading' ? (
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-muted animate-pulse" />
+              </div>
+            ) : session?.user ? (
+              <UserButton user={session.user} />
+            ) : (
+              <>
+                <button
+                  onClick={() => signIn(undefined, { callbackUrl: '/' })}
+                  className="px-4 py-2 text-sm font-medium text-foreground hover:text-purple-600 transition-colors"
+                >
+                  Entrar
+                </button>
+                <button
+                  onClick={() => signIn(undefined, { callbackUrl: '/' })}
+                  className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg hover:opacity-90 transition-opacity shadow-lg shadow-purple-500/25"
+                >
+                  Criar Conta Grátis
+                </button>
+              </>
+            )}
+          </motion.div>
+        </div>
+      </div>
+    </header>
+  )
+}
