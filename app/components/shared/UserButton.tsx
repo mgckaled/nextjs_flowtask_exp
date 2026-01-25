@@ -3,7 +3,7 @@
 import { signOut } from 'next-auth/react'
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence } from 'motion/react'
 
 interface UserButtonProps {
   user: {

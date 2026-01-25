@@ -257,7 +257,7 @@ export default function DemoPageContent() {
               className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row"
             >
               <motion.button
-                onClick={() => session ? window.location.href = '/dashboard' : signIn(undefined, { callbackUrl: '/dashboard' })}
+                onClick={() => session ? window.location.href = '/dashboard' : signIn('google', { callbackUrl: '/dashboard' })}
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-8 py-3 text-base font-medium text-white transition-colors hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700"

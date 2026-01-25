@@ -1,7 +1,7 @@
 'use client'
 
 import { useSession, signIn } from 'next-auth/react'
-import { motion } from 'framer-motion'
+import { motion } from 'motion/react'
 import UserButton from './UserButton'
 
 export default function Header() {
@@ -44,13 +44,13 @@ export default function Header() {
             ) : (
               <>
                 <button
-                  onClick={() => signIn(undefined, { callbackUrl: '/' })}
+                  onClick={() => signIn('google', { callbackUrl: '/' })}
                   className="px-4 py-2 text-sm font-medium text-foreground hover:text-purple-600 transition-colors"
                 >
                   Entrar
                 </button>
                 <button
-                  onClick={() => signIn(undefined, { callbackUrl: '/' })}
+                  onClick={() => signIn('google', { callbackUrl: '/' })}
                   className="px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg hover:opacity-90 transition-opacity shadow-lg shadow-purple-500/25"
                 >
                   Criar Conta Grátis

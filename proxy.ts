@@ -19,7 +19,7 @@ export default auth((req) => {
   return NextResponse.next()
 })
 
-// Rotas onde o middleware deve ser executado
+// Rotas onde o proxy deve ser executado
 export const config = {
   matcher: [
     /*

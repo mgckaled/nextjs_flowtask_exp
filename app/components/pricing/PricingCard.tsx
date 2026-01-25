@@ -28,7 +28,7 @@ export default function PricingCard({
   const handleSubscribe = () => {
     if (!session) {
       // Se não estiver autenticado, solicita login
-      signIn(undefined, { callbackUrl: '/pricing' })
+      signIn('google', { callbackUrl: '/pricing' })
     } else {
       // Se autenticado, processa a assinatura
       alert(`Você selecionou o plano ${name}!`)
