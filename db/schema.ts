@@ -81,11 +81,32 @@ export const userProfiles = pgTable("user_profiles", {
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
 })
 
+// Tabela de subscriptions (Stripe)
+export const subscriptions = pgTable("subscriptions", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  stripeCustomerId: text("stripe_customer_id"),
+  stripeSubscriptionId: text("stripe_subscription_id"),
+  stripePriceId: text("stripe_price_id"),
+  plan: text("plan").notNull().default("free"),
+  status: text("status").notNull().default("active"),
+  currentPeriodEnd: timestamp("current_period_end", { mode: "date" }),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+})
+
 // Relations para Drizzle Query API
 export const usersRelations = relations(users, ({ one }) => ({
   profile: one(userProfiles, {
     fields: [users.id],
     references: [userProfiles.userId],
+  }),
+  subscription: one(subscriptions, {
+    fields: [users.id],
+    references: [subscriptions.userId],
   }),
 }))
 
@@ -96,7 +117,16 @@ export const userProfilesRelations = relations(userProfiles, ({ one }) => ({
   }),
 }))
 
+export const subscriptionsRelations = relations(subscriptions, ({ one }) => ({
+  user: one(users, {
+    fields: [subscriptions.userId],
+    references: [users.id],
+  }),
+}))
+
 // Tipos inferidos
 export type User = typeof users.$inferSelect
 export type UserProfile = typeof userProfiles.$inferSelect
 export type NewUserProfile = typeof userProfiles.$inferInsert
+export type Subscription = typeof subscriptions.$inferSelect
+export type NewSubscription = typeof subscriptions.$inferInsert

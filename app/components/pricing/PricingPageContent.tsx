@@ -56,6 +56,7 @@ export default function PricingPageContent() {
             ]}
             buttonText="Começar Grátis"
             variant="default"
+            planId="free"
           />
 
           {/* Plano Pro (Popular) */}
@@ -75,6 +76,7 @@ export default function PricingPageContent() {
             buttonText="Assinar Pro"
             variant="popular"
             isPopular={true}
+            planId="pro"
           />
 
           {/* Plano Max */}
@@ -95,6 +97,7 @@ export default function PricingPageContent() {
             ]}
             buttonText="Assinar Max"
             variant="premium"
+            planId="max"
           />
         </motion.div>
 

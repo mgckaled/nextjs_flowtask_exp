@@ -3,6 +3,7 @@
 import { motion } from 'motion/react'
 import { CheckIcon } from '@heroicons/react/24/solid'
 import { useSession, signIn } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 export default function PricingCard({
   name,
@@ -13,6 +14,7 @@ export default function PricingCard({
   buttonText,
   variant = 'default',
   isPopular = false,
+  planId,
 }: {
   name: string
   price: string
@@ -22,17 +24,37 @@ export default function PricingCard({
   buttonText: string
   variant?: 'default' | 'popular' | 'premium'
   isPopular?: boolean
+  planId?: 'free' | 'pro' | 'max'
 }) {
   const { data: session } = useSession()
+  const router = useRouter()
 
   const handleSubscribe = () => {
-    if (!session) {
-      // Se não estiver autenticado, solicita login
-      signIn('google', { callbackUrl: '/pricing' })
-    } else {
-      // Se autenticado, processa a assinatura
-      alert(`Você selecionou o plano ${name}!`)
+    // Plano Free - vai direto para dashboard/onboarding
+    if (planId === 'free') {
+      if (!session) {
+        signIn(undefined, { callbackUrl: '/dashboard' })
+      } else {
+        router.push('/dashboard')
+      }
+      return
     }
+
+    // Planos pagos
+    if (!session) {
+      // Se não autenticado, login com retorno para pricing
+      signIn(undefined, { callbackUrl: `/pricing?plan=${planId}` })
+      return
+    }
+
+    if (!session.user.hasCompletedProfile) {
+      // Se não completou onboarding
+      router.push(`/onboarding?callbackUrl=/checkout?plan=${planId}`)
+      return
+    }
+
+    // Se autenticado e com perfil completo, vai para checkout
+    router.push(`/checkout?plan=${planId}`)
   }
 
   // Estilos baseados na variante

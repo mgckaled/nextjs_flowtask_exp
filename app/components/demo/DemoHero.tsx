@@ -1,6 +1,7 @@
 'use client'
 
 import { motion } from 'motion/react'
+import { SparklesIcon } from '@heroicons/react/24/solid'
 
 export default function DemoHero({ onReset }: { onReset: () => void }) {
   return (
@@ -14,7 +15,8 @@ export default function DemoHero({ onReset }: { onReset: () => void }) {
             className="mb-6 inline-block"
           >
             <span className="inline-flex items-center gap-2 rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-              ✨ Demonstração Interativa
+              <SparklesIcon className="h-4 w-4" />
+              Demonstração Interativa
             </span>
           </motion.div>
 

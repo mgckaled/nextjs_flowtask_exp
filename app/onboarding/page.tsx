@@ -10,8 +10,13 @@ export const metadata = {
   description: "Preencha suas informações para começar a usar o FlowTask",
 }
 
-export default async function OnboardingPage() {
+interface OnboardingPageProps {
+  searchParams: Promise<{ callbackUrl?: string }>
+}
+
+export default async function OnboardingPage({ searchParams }: OnboardingPageProps) {
   const session = await auth()
+  const params = await searchParams
 
   if (!session?.user?.id) {
     redirect("/api/auth/signin")
@@ -23,12 +28,15 @@ export default async function OnboardingPage() {
   })
 
   if (existingProfile?.onboardingCompleted) {
-    redirect("/dashboard")
+    redirect(params.callbackUrl || "/dashboard")
   }
 
   return (
     <main className="min-h-screen bg-background">
-      <OnboardingForm userName={session.user.name || "Usuário"} />
+      <OnboardingForm
+        userName={session.user.name || "Usuário"}
+        callbackUrl={params.callbackUrl}
+      />
     </main>
   )
 }

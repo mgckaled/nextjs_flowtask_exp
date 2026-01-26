@@ -1,5 +1,5 @@
 import { db } from "@/db"
-import { users, accounts, sessions, verificationTokens, userProfiles } from "@/db/schema"
+import { users, accounts, sessions, verificationTokens, userProfiles, subscriptions } from "@/db/schema"
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import { eq } from "drizzle-orm"
 import NextAuth from "next-auth"
@@ -41,8 +41,13 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         const profile = await db.query.userProfiles.findFirst({
           where: eq(userProfiles.userId, user.id),
         })
-
         session.user.hasCompletedProfile = !!profile?.onboardingCompleted
+
+        // Busca subscription para obter o plano
+        const subscription = await db.query.subscriptions.findFirst({
+          where: eq(subscriptions.userId, user.id),
+        })
+        session.user.plan = subscription?.plan || 'free'
       }
       return session
     },

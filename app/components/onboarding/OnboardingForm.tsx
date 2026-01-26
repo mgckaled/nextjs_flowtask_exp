@@ -20,6 +20,7 @@ import OnboardingProgress from './OnboardingProgress'
 
 interface OnboardingFormProps {
   userName: string
+  callbackUrl?: string
 }
 
 const STEPS = [
@@ -28,7 +29,7 @@ const STEPS = [
   { id: 3, title: 'Como nos Encontrou', fields: ['howDidYouHear'] },
 ]
 
-export default function OnboardingForm({ userName }: OnboardingFormProps) {
+export default function OnboardingForm({ userName, callbackUrl }: OnboardingFormProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -69,7 +70,7 @@ export default function OnboardingForm({ userName }: OnboardingFormProps) {
       const result = await saveOnboardingProfile(data)
 
       if (result.success) {
-        router.push('/dashboard')
+        router.push(callbackUrl || '/dashboard')
       } else {
         setError(result.message)
       }
