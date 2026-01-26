@@ -42,6 +42,6 @@ export default auth((req) => {
 // Rotas onde o proxy deve ser executado
 export const config = {
   matcher: [
-    '/((?!api/auth|_next/static|_next/image|favicon.ico|.*\\.png$).*)',
+    '/((?!api/auth|api/stripe|_next/static|_next/image|favicon.ico|.*\\.png$).*)',
   ],
 }

@@ -45,13 +45,13 @@ export const onboardingSchema = z.object({
     .min(2, 'Nome da empresa deve ter pelo menos 2 caracteres')
     .max(150, 'Nome da empresa deve ter no máximo 150 caracteres'),
   companySize: z.enum(['1-10', '11-50', '51-200', '201-500', '500+'], {
-    errorMap: () => ({ message: 'Selecione o tamanho da empresa' }),
+    message: 'Selecione o tamanho da empresa',
   }),
   industry: z
     .string()
     .min(1, 'Selecione o setor de atuação'),
   howDidYouHear: z.enum(['google', 'social_media', 'referral', 'other'], {
-    errorMap: () => ({ message: 'Selecione como conheceu o FlowTask' }),
+    message: 'Selecione como conheceu o FlowTask',
   }),
 })
 

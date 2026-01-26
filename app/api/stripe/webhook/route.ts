@@ -33,7 +33,7 @@ export async function POST(req: Request) {
         const session = event.data.object as Stripe.Checkout.Session
 
         if (session.mode === "subscription" && session.subscription) {
-          const subscription = await stripe.subscriptions.retrieve(
+          const subscriptionData = await stripe.subscriptions.retrieve(
             session.subscription as string
           )
 
@@ -46,16 +46,21 @@ export async function POST(req: Request) {
               where: eq(subscriptions.userId, userId),
             })
 
+            const periodEnd = (subscriptionData as unknown as { current_period_end?: number }).current_period_end
+            const currentPeriodEnd = periodEnd
+              ? new Date(periodEnd * 1000)
+              : null
+
             if (existing) {
               await db
                 .update(subscriptions)
                 .set({
                   stripeCustomerId: session.customer as string,
-                  stripeSubscriptionId: subscription.id,
-                  stripePriceId: subscription.items.data[0]?.price.id,
+                  stripeSubscriptionId: subscriptionData.id,
+                  stripePriceId: subscriptionData.items.data[0]?.price.id,
                   plan,
-                  status: subscription.status,
-                  currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+                  status: subscriptionData.status,
+                  currentPeriodEnd,
                   updatedAt: new Date(),
                 })
                 .where(eq(subscriptions.userId, userId))
@@ -63,11 +68,11 @@ export async function POST(req: Request) {
               await db.insert(subscriptions).values({
                 userId,
                 stripeCustomerId: session.customer as string,
-                stripeSubscriptionId: subscription.id,
-                stripePriceId: subscription.items.data[0]?.price.id,
+                stripeSubscriptionId: subscriptionData.id,
+                stripePriceId: subscriptionData.items.data[0]?.price.id,
                 plan,
-                status: subscription.status,
-                currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+                status: subscriptionData.status,
+                currentPeriodEnd,
               })
             }
           }
@@ -77,16 +82,21 @@ export async function POST(req: Request) {
 
       case "customer.subscription.updated":
       case "customer.subscription.deleted": {
-        const subscription = event.data.object as Stripe.Subscription
-        const userId = subscription.metadata?.userId
+        const subEvent = event.data.object as Stripe.Subscription
+        const userId = subEvent.metadata?.userId
 
         if (userId) {
+          const periodEnd = (subEvent as unknown as { current_period_end?: number }).current_period_end
+          const currentPeriodEnd = periodEnd
+            ? new Date(periodEnd * 1000)
+            : null
+
           await db
             .update(subscriptions)
             .set({
-              status: subscription.status,
-              plan: subscription.status === "canceled" ? "free" : undefined,
-              currentPeriodEnd: new Date(subscription.current_period_end * 1000),
+              status: subEvent.status,
+              plan: subEvent.status === "canceled" ? "free" : undefined,
+              currentPeriodEnd,
               updatedAt: new Date(),
             })
             .where(eq(subscriptions.userId, userId))
@@ -96,7 +106,7 @@ export async function POST(req: Request) {
 
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice
-        const subscriptionId = invoice.subscription as string
+        const subscriptionId = (invoice as unknown as { subscription?: string }).subscription
 
         if (subscriptionId) {
           await db

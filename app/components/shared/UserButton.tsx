@@ -10,7 +10,14 @@ interface UserButtonProps {
     name?: string | null
     email?: string | null
     image?: string | null
+    plan?: string
   }
+}
+
+const planLabels: Record<string, { label: string; color: string }> = {
+  free: { label: 'Free', color: 'bg-zinc-500' },
+  pro: { label: 'Pro', color: 'bg-gradient-to-r from-purple-500 to-pink-500' },
+  max: { label: 'Max', color: 'bg-gradient-to-r from-amber-500 to-orange-500' },
 }
 
 export default function UserButton({ user }: UserButtonProps) {
@@ -74,6 +81,12 @@ export default function UserButton({ user }: UserButtonProps) {
             <div className="p-4 border-b border-border">
               <p className="font-semibold text-sm">{user.name || 'Usuário'}</p>
               <p className="text-xs text-muted-foreground mt-0.5">{user.email}</p>
+              <div className="mt-2 flex items-center gap-2">
+                <span className="text-xs text-muted-foreground">Plano:</span>
+                <span className={`text-xs font-medium text-white px-2 py-0.5 rounded-full ${planLabels[user.plan || 'free']?.color || planLabels.free.color}`}>
+                  {planLabels[user.plan || 'free']?.label || 'Free'}
+                </span>
+              </div>
             </div>
             <div className="p-2">
               <button

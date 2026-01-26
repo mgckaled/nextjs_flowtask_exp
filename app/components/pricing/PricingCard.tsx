@@ -5,6 +5,8 @@ import { CheckIcon } from '@heroicons/react/24/solid'
 import { useSession, signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 
+const planHierarchy = { free: 0, pro: 1, max: 2 }
+
 export default function PricingCard({
   name,
   price,
@@ -29,7 +31,20 @@ export default function PricingCard({
   const { data: session } = useSession()
   const router = useRouter()
 
+  const userPlan = (session?.user?.plan || 'free') as 'free' | 'pro' | 'max'
+  const isCurrentPlan = planId === userPlan
+  const isLowerPlan = planId ? planHierarchy[planId] < planHierarchy[userPlan] : false
+  const isDisabled = isCurrentPlan || isLowerPlan
+
+  const getButtonText = () => {
+    if (isCurrentPlan) return 'Plano Atual'
+    if (isLowerPlan) return 'Plano Inferior'
+    return buttonText
+  }
+
   const handleSubscribe = () => {
+    if (isDisabled) return
+
     // Plano Free - vai direto para dashboard/onboarding
     if (planId === 'free') {
       if (!session) {
@@ -82,8 +97,22 @@ export default function PricingCard({
       whileHover={{ y: -8, transition: { duration: 0.2 } }}
       className={`relative flex flex-col rounded-lg border bg-card p-8 shadow-sm transition-shadow hover:shadow-lg ${borderStyle[variant]}`}
     >
-      {/* Badge Popular */}
-      {isPopular && (
+      {/* Badge Plano Atual */}
+      {isCurrentPlan && (
+        <motion.div
+          className="absolute -top-4 left-1/2 -translate-x-1/2"
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+        >
+          <span className="inline-block rounded-full bg-green-600 px-4 py-1 text-sm font-semibold text-white">
+            Seu Plano
+          </span>
+        </motion.div>
+      )}
+
+      {/* Badge Popular (apenas se não for plano atual) */}
+      {isPopular && !isCurrentPlan && (
         <motion.div
           className="absolute -top-4 left-1/2 -translate-x-1/2"
           initial={{ opacity: 0, scale: 0.8 }}
@@ -129,12 +158,17 @@ export default function PricingCard({
       {/* Botão CTA */}
       <motion.button
         onClick={handleSubscribe}
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
+        disabled={isDisabled}
+        whileHover={!isDisabled ? { scale: 1.02 } : {}}
+        whileTap={!isDisabled ? { scale: 0.98 } : {}}
         transition={{ duration: 0.2 }}
-        className={`w-full rounded-lg px-6 py-3 font-semibold transition-colors ${buttonStyle[variant]}`}
+        className={`w-full rounded-lg px-6 py-3 font-semibold transition-colors ${
+          isDisabled
+            ? 'bg-muted text-muted-foreground cursor-not-allowed'
+            : buttonStyle[variant]
+        }`}
       >
-        {buttonText}
+        {getButtonText()}
       </motion.button>
 
       {/* Features */}

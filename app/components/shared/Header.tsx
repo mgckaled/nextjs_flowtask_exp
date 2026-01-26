@@ -13,7 +13,7 @@ export default function Header() {
   const isLoggedIn = !!session?.user
   const hasCompletedProfile = session?.user?.hasCompletedProfile
   const userPlan = session?.user?.plan || 'free'
-  const showUpgrade = isLoggedIn && hasCompletedProfile && userPlan === 'free'
+  const showUpgrade = isLoggedIn && hasCompletedProfile && userPlan !== 'max'
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-md">
@@ -96,16 +96,16 @@ export default function Header() {
               </div>
             ) : isLoggedIn ? (
               <>
-                {/* Botão Upgrade Pro - apenas para plano Free */}
+                {/* Botão Upgrade - Free → Pro, Pro → Max */}
                 {showUpgrade && (
-                  <Link href="/checkout?plan=pro">
+                  <Link href={`/checkout?plan=${userPlan === 'free' ? 'pro' : 'max'}`}>
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       className="hidden sm:flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg hover:opacity-90 transition-opacity shadow-lg shadow-orange-500/25"
                     >
                       <BoltIcon className="w-4 h-4" />
-                      Upgrade Pro
+                      {userPlan === 'free' ? 'Upgrade Pro' : 'Upgrade Max'}
                     </motion.button>
                   </Link>
                 )}

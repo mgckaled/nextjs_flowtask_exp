@@ -19,11 +19,7 @@ interface Particle {
 
 type GeometricPattern = 'chaos' | 'grid' | 'circle' | 'spiral' | 'wave'
 
-function createInitialParticles() {
-  if (typeof window === 'undefined') return []
-
-  const width = window.innerWidth
-  const height = window.innerHeight
+function createParticles(width: number, height: number): Particle[] {
   const count = width < 768 ? 16 : 24
 
   return Array.from({ length: count }, (_, index) => {
@@ -111,19 +107,24 @@ function calculateGeometricPosition(
 }
 
 export default function AnimatedBackground() {
-  const [particles] = useState(createInitialParticles)
+  const [particles, setParticles] = useState<Particle[]>([])
   const [currentPattern, setCurrentPattern] = useState<GeometricPattern>('chaos')
+  const [isMounted, setIsMounted] = useState(false)
   const particlesRef = useRef<Particle[]>([])
   const elementRefs = useRef<(HTMLDivElement | null)[]>([])
   const dimensionsRef = useRef({ width: 0, height: 0 })
 
+  // Inicializar partículas apenas no cliente
   useEffect(() => {
-    dimensionsRef.current = {
-      width: window.innerWidth,
-      height: window.innerHeight,
-    }
+    setIsMounted(true)
+    const width = window.innerWidth
+    const height = window.innerHeight
 
-    particlesRef.current = particles
+    dimensionsRef.current = { width, height }
+
+    const newParticles = createParticles(width, height)
+    setParticles(newParticles)
+    particlesRef.current = newParticles
 
     const updateDimensions = () => {
       dimensionsRef.current = {
@@ -134,7 +135,7 @@ export default function AnimatedBackground() {
 
     window.addEventListener('resize', updateDimensions)
     return () => window.removeEventListener('resize', updateDimensions)
-  }, [particles])
+  }, [])
 
   useEffect(() => {
     const patterns: GeometricPattern[] = ['chaos', 'grid', 'circle', 'spiral', 'wave']
@@ -212,6 +213,11 @@ export default function AnimatedBackground() {
       }
     })
   })
+
+  // Não renderiza nada no servidor para evitar hydration mismatch
+  if (!isMounted) {
+    return <div className="pointer-events-none absolute inset-0 overflow-hidden" />
+  }
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
