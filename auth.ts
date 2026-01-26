@@ -4,7 +4,6 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import NextAuth from "next-auth"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
-import Facebook from "next-auth/providers/facebook"
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
   adapter: DrizzleAdapter(db, {
@@ -17,6 +16,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     Google({
       clientId: process.env.AUTH_GOOGLE_ID,
       clientSecret: process.env.AUTH_GOOGLE_SECRET,
+      allowDangerousEmailAccountLinking: true,
       authorization: {
         params: {
           prompt: "consent",
@@ -28,10 +28,7 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
     GitHub({
       clientId: process.env.AUTH_GITHUB_ID,
       clientSecret: process.env.AUTH_GITHUB_SECRET,
-    }),
-    Facebook({
-      clientId: process.env.AUTH_FACEBOOK_ID,
-      clientSecret: process.env.AUTH_FACEBOOK_SECRET,
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   // Removido pages.signIn para permitir que Auth.js mostre página de providers
