@@ -15,6 +15,13 @@
       "when": 1769419476734,
       "tag": "0001_harsh_raider",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1769445073065,
+      "tag": "0002_add_preferences",
+      "breakpoints": true
     }
   ]
 }

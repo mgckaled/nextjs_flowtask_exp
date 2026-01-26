@@ -3,7 +3,9 @@
 import { signOut } from 'next-auth/react'
 import { useState, useRef, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { motion, AnimatePresence } from 'motion/react'
+import { UserIcon, ArrowRightStartOnRectangleIcon } from '@heroicons/react/24/outline'
 
 interface UserButtonProps {
   user: {
@@ -88,14 +90,20 @@ export default function UserButton({ user }: UserButtonProps) {
                 </span>
               </div>
             </div>
-            <div className="p-2">
+            <div className="p-2 space-y-1">
+              <Link
+                href="/account"
+                onClick={() => setIsOpen(false)}
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted/80 transition-colors"
+              >
+                <UserIcon className="w-4 h-4" />
+                Minha Conta
+              </Link>
               <button
                 onClick={handleSignOut}
-                className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted/80 transition-colors text-left"
+                className="w-full flex items-center gap-2 px-3 py-2 text-sm rounded-md hover:bg-muted/80 transition-colors text-left text-red-600 dark:text-red-400"
               >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
+                <ArrowRightStartOnRectangleIcon className="w-4 h-4" />
                 Sair
               </button>
             </div>

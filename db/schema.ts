@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm"
-import { boolean, integer, pgEnum, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core"
+import { boolean, integer, jsonb, pgEnum, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core"
 import type { AdapterAccountType } from "next-auth/adapters"
 
 // Enums para campos do perfil
@@ -63,6 +63,13 @@ export const verificationTokens = pgTable(
   })
 )
 
+// Tipo para preferências do usuário
+export type UserPreferences = {
+  theme: 'light' | 'dark' | 'system'
+  emailNotifications: boolean
+  marketingEmails: boolean
+}
+
 // Tabela de perfil do usuário (onboarding)
 export const userProfiles = pgTable("user_profiles", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -76,6 +83,11 @@ export const userProfiles = pgTable("user_profiles", {
   companySize: companySizeEnum("company_size").notNull(),
   industry: text("industry").notNull(),
   howDidYouHear: howDidYouHearEnum("how_did_you_hear").notNull(),
+  preferences: jsonb("preferences").$type<UserPreferences>().default({
+    theme: 'system',
+    emailNotifications: true,
+    marketingEmails: false,
+  }),
   onboardingCompleted: boolean("onboarding_completed").default(true).notNull(),
   createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),

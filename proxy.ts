@@ -25,14 +25,16 @@ export default auth((req) => {
   const hasCompletedProfile = req.auth?.user?.hasCompletedProfile
   const isOnboardingPage = pathname === '/onboarding'
   const isDashboardPage = pathname.startsWith('/dashboard')
+  const isAccountPage = pathname.startsWith('/account')
+  const requiresProfile = isDashboardPage || isAccountPage
 
   // Se está no onboarding mas já completou perfil, vai pro dashboard
   if (isOnboardingPage && hasCompletedProfile) {
     return NextResponse.redirect(new URL('/dashboard', req.url))
   }
 
-  // Se tenta acessar dashboard sem completar perfil, vai pro onboarding
-  if (isDashboardPage && !hasCompletedProfile) {
+  // Se tenta acessar páginas que requerem perfil sem completá-lo, vai pro onboarding
+  if (requiresProfile && !hasCompletedProfile) {
     return NextResponse.redirect(new URL('/onboarding', req.url))
   }
 
