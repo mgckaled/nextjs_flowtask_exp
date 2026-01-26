@@ -13,6 +13,7 @@
     "@heroicons/react": "^2.2.0",
     "@hookform/resolvers": "^5.2.2",
     "@neondatabase/serverless": "^1.0.2",
+    "@react-email/components": "^1.0.6",
     "@stripe/stripe-js": "^8.6.4",
     "drizzle-orm": "^0.45.1",
     "motion": "^12.29.0",
@@ -22,6 +23,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "react-hook-form": "^7.71.1",
+    "resend": "^6.8.0",
     "stripe": "^20.2.0",
     "zod": "^4.3.6"
   },

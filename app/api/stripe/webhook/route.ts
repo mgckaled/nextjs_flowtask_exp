@@ -1,9 +1,10 @@
 import { stripe } from "@/lib/stripe"
 import { db } from "@/db"
-import { subscriptions } from "@/db/schema"
+import { subscriptions, users } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { headers } from "next/headers"
 import Stripe from "stripe"
+import { sendPaymentConfirmation } from "@/app/actions/email"
 
 export async function POST(req: Request) {
   const body = await req.text()
@@ -73,6 +74,27 @@ export async function POST(req: Request) {
                 plan,
                 status: subscriptionData.status,
                 currentPeriodEnd,
+              })
+            }
+
+            // Enviar email de confirmação de pagamento
+            const user = await db.query.users.findFirst({
+              where: eq(users.id, userId),
+            })
+
+            if (user?.email) {
+              const amount = session.amount_total
+                ? `R$ ${(session.amount_total / 100).toFixed(2).replace('.', ',')}`
+                : 'Valor não disponível'
+
+              await sendPaymentConfirmation(user.email, {
+                name: user.name || 'Cliente',
+                plan: plan as 'pro' | 'max',
+                amount,
+                date: new Date().toLocaleDateString('pt-BR'),
+                nextBillingDate: currentPeriodEnd
+                  ? currentPeriodEnd.toLocaleDateString('pt-BR')
+                  : undefined,
               })
             }
           }
