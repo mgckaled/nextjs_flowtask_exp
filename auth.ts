@@ -1,6 +1,7 @@
 import { db } from "@/db"
-import { users, accounts, sessions, verificationTokens } from "@/db/schema"
+import { users, accounts, sessions, verificationTokens, userProfiles } from "@/db/schema"
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
+import { eq } from "drizzle-orm"
 import NextAuth from "next-auth"
 import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
@@ -31,12 +32,17 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
       allowDangerousEmailAccountLinking: true,
     }),
   ],
-  // Removido pages.signIn para permitir que Auth.js mostre página de providers
-  // Se você quiser uma página customizada, crie em app/auth/signin/page.tsx
   callbacks: {
-    session({ session, user }) {
+    async session({ session, user }) {
       if (session.user) {
         session.user.id = user.id
+
+        // Verifica se o perfil foi completado
+        const profile = await db.query.userProfiles.findFirst({
+          where: eq(userProfiles.userId, user.id),
+        })
+
+        session.user.hasCompletedProfile = !!profile?.onboardingCompleted
       }
       return session
     },

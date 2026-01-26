@@ -1,5 +1,15 @@
-import { integer, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core"
+import { relations } from "drizzle-orm"
+import { boolean, integer, pgEnum, pgTable, primaryKey, text, timestamp, uuid } from "drizzle-orm/pg-core"
 import type { AdapterAccountType } from "next-auth/adapters"
+
+// Enums para campos do perfil
+export const companySizeEnum = pgEnum('company_size', [
+  '1-10', '11-50', '51-200', '201-500', '500+'
+])
+
+export const howDidYouHearEnum = pgEnum('how_did_you_hear', [
+  'google', 'social_media', 'referral', 'other'
+])
 
 export const users = pgTable("users", {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -52,3 +62,41 @@ export const verificationTokens = pgTable(
     compositePk: primaryKey({ columns: [vt.identifier, vt.token] }),
   })
 )
+
+// Tabela de perfil do usuário (onboarding)
+export const userProfiles = pgTable("user_profiles", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .notNull()
+    .unique()
+    .references(() => users.id, { onDelete: "cascade" }),
+  phone: text("phone").notNull(),
+  jobTitle: text("job_title").notNull(),
+  company: text("company").notNull(),
+  companySize: companySizeEnum("company_size").notNull(),
+  industry: text("industry").notNull(),
+  howDidYouHear: howDidYouHearEnum("how_did_you_hear").notNull(),
+  onboardingCompleted: boolean("onboarding_completed").default(true).notNull(),
+  createdAt: timestamp("created_at", { mode: "date" }).defaultNow().notNull(),
+  updatedAt: timestamp("updated_at", { mode: "date" }).defaultNow().notNull(),
+})
+
+// Relations para Drizzle Query API
+export const usersRelations = relations(users, ({ one }) => ({
+  profile: one(userProfiles, {
+    fields: [users.id],
+    references: [userProfiles.userId],
+  }),
+}))
+
+export const userProfilesRelations = relations(userProfiles, ({ one }) => ({
+  user: one(users, {
+    fields: [userProfiles.userId],
+    references: [users.id],
+  }),
+}))
+
+// Tipos inferidos
+export type User = typeof users.$inferSelect
+export type UserProfile = typeof userProfiles.$inferSelect
+export type NewUserProfile = typeof userProfiles.$inferInsert
