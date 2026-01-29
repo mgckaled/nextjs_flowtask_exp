@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
-import { Roboto, Roboto_Mono } from "next/font/google";
+import { Space_Grotesk, Merriweather } from "next/font/google";
 import "./globals.css";
 import Providers from "./components/Providers";
 import Header from "./components/shared/Header";
 
-const roboto = Roboto({
-  variable: "--font-roboto",
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-space-grotesk",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "700"],
+  weight: ["400", "600", "700"],
+  display: "swap",
 });
 
-const robotoMono = Roboto_Mono({
-  variable: "--font-roboto-mono",
+const merriweather = Merriweather({
+  variable: "--font-merriweather",
   subsets: ["latin"],
+  weight: ["400", "700"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -31,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${roboto.variable} ${robotoMono.variable} antialiased`}
+        className={`${spaceGrotesk.variable} ${merriweather.variable} antialiased`}
       >
         <Providers>
           <Header />

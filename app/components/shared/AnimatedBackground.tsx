@@ -1,130 +1,275 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useCallback, useSyncExternalStore } from 'react'
 import { useAnimationFrame } from 'motion/react'
 
-interface Particle {
+interface TaskElement {
+  id: number
+  type: 'checkbox' | 'card' | 'progress'
   x: number
   y: number
   size: number
   opacity: number
-  baseOpacity: number
+  rotation: number
+  progress: number
   targetX: number
   targetY: number
-  velocityX: number
-  velocityY: number
-  staggerDelay: number
-  delayTimer: number
+  delay: number
+  timer: number
+  isCompleted: boolean
+  completionTimer: number
+  color: 'primary' | 'secondary' | 'accent'
+  svgGroup?: SVGGElement
 }
 
-type GeometricPattern = 'chaos' | 'grid' | 'circle' | 'spiral' | 'wave'
+interface ConnectionLine {
+  id: number
+  startX: number
+  startY: number
+  endX: number
+  endY: number
+  progress: number
+  opacity: number
+  delay: number
+  timer: number
+  svgPath?: SVGPathElement
+}
 
-function createParticles(width: number, height: number): Particle[] {
-  const count = width < 768 ? 16 : 24
+function createTaskElements(width: number, height: number): TaskElement[] {
+  const count = width < 768 ? 12 : 18
+  const types: TaskElement['type'][] = ['checkbox', 'card', 'progress', 'checkbox', 'card']
+  const colors: TaskElement['color'][] = ['primary', 'secondary', 'accent']
 
   return Array.from({ length: count }, (_, index) => {
-    const x = Math.random() * width
-    const y = Math.random() * height
-    const staggerDelay = index * 0.08
+    const margin = 80
+    const x = Math.random() * (width - margin * 2) + margin
+    const y = Math.random() * (height - margin * 2) + margin
+
     return {
+      id: index,
+      type: types[index % types.length],
       x,
       y,
-      size: Math.random() * 12 + 6,
+      size: Math.random() * 20 + 24,
       opacity: 0,
-      baseOpacity: Math.random() * 0.4 + 0.3,
+      rotation: Math.random() * 20 - 10,
+      progress: 0,
       targetX: x,
       targetY: y,
-      velocityX: 0,
-      velocityY: 0,
-      staggerDelay,
-      delayTimer: staggerDelay,
+      delay: index * 0.15,
+      timer: 0,
+      isCompleted: false,
+      completionTimer: Math.random() * 8 + 4,
+      color: colors[index % colors.length],
     }
   })
 }
 
-function calculateGeometricPosition(
-  index: number,
-  total: number,
-  pattern: GeometricPattern,
-  width: number,
-  height: number
-): { x: number; y: number } {
-  const centerX = width / 2
-  const centerY = height / 2
-  const margin = 100
+function createConnectionLines(elements: TaskElement[], screenWidth: number): ConnectionLine[] {
+  const lines: ConnectionLine[] = []
+  const maxConnections = screenWidth < 768 ? 4 : 8
 
-  switch (pattern) {
-    case 'grid': {
-      const cols = Math.ceil(Math.sqrt(total))
-      const rows = Math.ceil(total / cols)
-      const spacing = Math.min((width - margin * 2) / (cols + 1), (height - margin * 2) / (rows + 1))
-      const col = index % cols
-      const row = Math.floor(index / cols)
-      const gridWidth = cols * spacing
-      const gridHeight = rows * spacing
-      return {
-        x: centerX - gridWidth / 2 + col * spacing + spacing,
-        y: centerY - gridHeight / 2 + row * spacing + spacing,
-      }
+  for (let i = 0; i < maxConnections; i++) {
+    const startIdx = Math.floor(Math.random() * elements.length)
+    let endIdx = Math.floor(Math.random() * elements.length)
+    while (endIdx === startIdx) {
+      endIdx = Math.floor(Math.random() * elements.length)
     }
 
-    case 'circle': {
-      const radius = Math.min(width, height) * 0.3
-      const angle = (index / total) * Math.PI * 2
-      return {
-        x: centerX + Math.cos(angle) * radius,
-        y: centerY + Math.sin(angle) * radius,
-      }
-    }
-
-    case 'spiral': {
-      const spiralTightness = 0.3
-      const maxRadius = Math.min(width, height) * 0.35
-      const angle = (index / total) * Math.PI * 4
-      const radius = (index / total) * maxRadius * spiralTightness + maxRadius * (1 - spiralTightness)
-      return {
-        x: centerX + Math.cos(angle) * radius,
-        y: centerY + Math.sin(angle) * radius,
-      }
-    }
-
-    case 'wave': {
-      const spacing = (width - margin * 2) / (total + 1)
-      const waveHeight = height * 0.2
-      const frequency = 2
-      const x = margin + spacing * (index + 1)
-      const y = centerY + Math.sin((index / total) * Math.PI * frequency) * waveHeight
-      return { x, y }
-    }
-
-    case 'chaos':
-    default:
-      return {
-        x: Math.random() * (width - margin * 2) + margin,
-        y: Math.random() * (height - margin * 2) + margin,
-      }
+    lines.push({
+      id: i,
+      startX: elements[startIdx].x,
+      startY: elements[startIdx].y,
+      endX: elements[endIdx].x,
+      endY: elements[endIdx].y,
+      progress: 0,
+      opacity: 0,
+      delay: i * 0.3 + 1,
+      timer: 0,
+    })
   }
+
+  return lines
+}
+
+function useIsMounted() {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  )
+}
+
+const COLOR_VALUES = {
+  primary: 'var(--primary)',
+  secondary: 'var(--secondary)',
+  accent: 'var(--accent-fg)',
 }
 
 export default function AnimatedBackground() {
-  const [particles, setParticles] = useState<Particle[]>([])
-  const [currentPattern, setCurrentPattern] = useState<GeometricPattern>('chaos')
-  const [isMounted, setIsMounted] = useState(false)
-  const particlesRef = useRef<Particle[]>([])
-  const elementRefs = useRef<(HTMLDivElement | null)[]>([])
+  const isMounted = useIsMounted()
+  const elementsRef = useRef<TaskElement[]>([])
+  const connectionsRef = useRef<ConnectionLine[]>([])
   const dimensionsRef = useRef({ width: 0, height: 0 })
+  const svgRef = useRef<SVGSVGElement>(null)
+  const isInitializedRef = useRef(false)
 
-  // Inicializar partículas apenas no cliente
+  // Criar elementos SVG uma única vez
+  const initializeSVGElements = useCallback(() => {
+    if (!svgRef.current) return
+
+    // Limpar SVG
+    while (svgRef.current.firstChild) {
+      svgRef.current.removeChild(svgRef.current.firstChild)
+    }
+
+    // Criar conexões
+    connectionsRef.current.forEach(conn => {
+      const path = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+      path.setAttribute('fill', 'none')
+      path.setAttribute('stroke', 'currentColor')
+      path.setAttribute('stroke-width', '2')
+      path.setAttribute('stroke-linecap', 'round')
+      path.setAttribute('class', 'text-border')
+      path.style.filter = 'blur(0.5px)'
+      conn.svgPath = path
+      svgRef.current?.appendChild(path)
+    })
+
+    // Criar elementos
+    elementsRef.current.forEach(element => {
+      const color = COLOR_VALUES[element.color]
+      const g = document.createElementNS('http://www.w3.org/2000/svg', 'g')
+
+      if (element.type === 'checkbox') {
+        const size = element.size
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+        rect.setAttribute('x', '10')
+        rect.setAttribute('y', '10')
+        rect.setAttribute('width', String(size - 20))
+        rect.setAttribute('height', String(size - 20))
+        rect.setAttribute('rx', '8')
+        rect.setAttribute('fill', 'none')
+        rect.setAttribute('stroke', color)
+        rect.setAttribute('stroke-width', '3')
+        rect.setAttribute('data-type', 'box')
+        g.appendChild(rect)
+
+        const checkPath = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+        checkPath.setAttribute('d', 'M 25 50 L 40 65 L 75 30')
+        checkPath.setAttribute('fill', 'none')
+        checkPath.setAttribute('stroke', color)
+        checkPath.setAttribute('stroke-width', '4')
+        checkPath.setAttribute('stroke-linecap', 'round')
+        checkPath.setAttribute('stroke-linejoin', 'round')
+        checkPath.setAttribute('stroke-dasharray', '70')
+        checkPath.setAttribute('transform', `scale(${(size - 20) / 80})`)
+        checkPath.setAttribute('data-type', 'check')
+        g.appendChild(checkPath)
+      } else if (element.type === 'card') {
+        const width = element.size * 1.6
+        const height = element.size
+
+        const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+        rect.setAttribute('x', '0')
+        rect.setAttribute('y', '0')
+        rect.setAttribute('width', String(width))
+        rect.setAttribute('height', String(height))
+        rect.setAttribute('rx', '6')
+        rect.setAttribute('fill', 'none')
+        rect.setAttribute('stroke', color)
+        rect.setAttribute('stroke-width', '2')
+        rect.style.filter = `drop-shadow(0 4px 12px ${color}40)`
+        g.appendChild(rect)
+
+        const linePositions = [0.3, 0.5, 0.7]
+        const lineWidths = [0.7, 0.5, 0.6]
+        const lineOpacities = [0.6, 0.4, 0.3]
+
+        linePositions.forEach((pos, i) => {
+          const line = document.createElementNS('http://www.w3.org/2000/svg', 'line')
+          line.setAttribute('x1', '8')
+          line.setAttribute('y1', String(height * pos))
+          line.setAttribute('x2', String(width * lineWidths[i]))
+          line.setAttribute('y2', String(height * pos))
+          line.setAttribute('stroke', color)
+          line.setAttribute('stroke-width', '2')
+          line.setAttribute('stroke-linecap', 'round')
+          line.style.opacity = String(lineOpacities[i])
+          g.appendChild(line)
+        })
+
+        const miniBox = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+        miniBox.setAttribute('x', String(width - 16))
+        miniBox.setAttribute('y', '6')
+        miniBox.setAttribute('width', '10')
+        miniBox.setAttribute('height', '10')
+        miniBox.setAttribute('rx', '2')
+        miniBox.setAttribute('stroke', color)
+        miniBox.setAttribute('stroke-width', '1.5')
+        miniBox.setAttribute('data-type', 'minibox')
+        g.appendChild(miniBox)
+      } else if (element.type === 'progress') {
+        const width = element.size * 2
+        const height = 8
+
+        const bgRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+        bgRect.setAttribute('x', '0')
+        bgRect.setAttribute('y', '0')
+        bgRect.setAttribute('width', String(width))
+        bgRect.setAttribute('height', String(height))
+        bgRect.setAttribute('rx', '4')
+        bgRect.setAttribute('fill', color)
+        bgRect.style.opacity = '0.2'
+        g.appendChild(bgRect)
+
+        const progressRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect')
+        progressRect.setAttribute('x', '0')
+        progressRect.setAttribute('y', '0')
+        progressRect.setAttribute('height', String(height))
+        progressRect.setAttribute('rx', '4')
+        progressRect.setAttribute('fill', color)
+        progressRect.setAttribute('data-type', 'progress-bar')
+        progressRect.style.filter = `drop-shadow(0 0 6px ${color})`
+        g.appendChild(progressRect)
+
+        const text = document.createElementNS('http://www.w3.org/2000/svg', 'text')
+        text.setAttribute('x', String(width / 2))
+        text.setAttribute('y', String(height + 14))
+        text.setAttribute('text-anchor', 'middle')
+        text.setAttribute('fill', color)
+        text.setAttribute('font-size', '10')
+        text.setAttribute('font-family', 'var(--font-space-grotesk)')
+        text.setAttribute('font-weight', '600')
+        text.setAttribute('data-type', 'progress-text')
+        g.appendChild(text)
+      }
+
+      element.svgGroup = g
+      svgRef.current?.appendChild(g)
+    })
+  }, [])
+
+  // Inicializar
   useEffect(() => {
-    setIsMounted(true)
+    if (!isMounted || isInitializedRef.current) return
+
     const width = window.innerWidth
     const height = window.innerHeight
 
     dimensionsRef.current = { width, height }
 
-    const newParticles = createParticles(width, height)
-    setParticles(newParticles)
-    particlesRef.current = newParticles
+    const newElements = createTaskElements(width, height)
+    const newConnections = createConnectionLines(newElements, width)
+
+    elementsRef.current = newElements
+    connectionsRef.current = newConnections
+    isInitializedRef.current = true
+
+    // Criar elementos SVG após um micro delay para garantir que o ref está pronto
+    requestAnimationFrame(() => {
+      initializeSVGElements()
+    })
 
     const updateDimensions = () => {
       dimensionsRef.current = {
@@ -135,113 +280,157 @@ export default function AnimatedBackground() {
 
     window.addEventListener('resize', updateDimensions)
     return () => window.removeEventListener('resize', updateDimensions)
-  }, [])
-
-  useEffect(() => {
-    const patterns: GeometricPattern[] = ['chaos', 'grid', 'circle', 'spiral', 'wave']
-    let currentIndex = 0
-
-    const interval = setInterval(() => {
-      currentIndex = (currentIndex + 1) % patterns.length
-      setCurrentPattern(patterns[currentIndex])
-    }, 5000)
-
-    return () => clearInterval(interval)
-  }, [])
+  }, [isMounted, initializeSVGElements])
 
   useAnimationFrame((_time, delta) => {
-    if (particlesRef.current.length === 0) return
+    if (elementsRef.current.length === 0) return
 
-    const { width, height } = dimensionsRef.current
     const deltaSeconds = delta / 1000
+    const { width, height } = dimensionsRef.current
 
-    // Spring physics parameters - mais suave e fluido
-    const stiffness = 0.05
-    const damping = 0.85
+    // Atualizar conexões
+    connectionsRef.current.forEach(connection => {
+      connection.timer += deltaSeconds
 
-    particlesRef.current.forEach((particle, index) => {
-      // Atualizar delay timer
-      particle.delayTimer += deltaSeconds
-
-      // Calcular nova posição target baseada no padrão atual
-      const { x: targetX, y: targetY } = calculateGeometricPosition(
-        index,
-        particlesRef.current.length,
-        currentPattern,
-        width,
-        height
-      )
-
-      // Aplicar stagger: só começa a mover após o delay
-      const isActive = particle.delayTimer >= particle.staggerDelay
-
-      if (isActive) {
-        particle.targetX = targetX
-        particle.targetY = targetY
+      if (connection.timer >= connection.delay) {
+        if (connection.progress < 1) {
+          connection.progress = Math.min(connection.progress + deltaSeconds * 0.5, 1)
+        }
+        if (connection.opacity < 1) {
+          connection.opacity = Math.min(connection.opacity + deltaSeconds * 0.5, 1)
+        }
       }
 
-      // Spring physics
-      const dx = particle.targetX - particle.x
-      const dy = particle.targetY - particle.y
+      // Atualizar posições baseado nos elementos
+      if (connection.id < elementsRef.current.length - 1) {
+        const startEl = elementsRef.current[connection.id]
+        const endEl = elementsRef.current[(connection.id + 1) % elementsRef.current.length]
+        connection.startX = startEl.x
+        connection.startY = startEl.y
+        connection.endX = endEl.x
+        connection.endY = endEl.y
+      }
 
-      const forceX = dx * stiffness
-      const forceY = dy * stiffness
+      // Atualizar SVG da conexão
+      if (connection.svgPath) {
+        const midX = (connection.startX + connection.endX) / 2
+        const midY = (connection.startY + connection.endY) / 2 - 30
+        const pathD = `M ${connection.startX} ${connection.startY} Q ${midX} ${midY} ${connection.endX} ${connection.endY}`
+        const pathLength = 200
 
-      particle.velocityX = particle.velocityX * damping + forceX
-      particle.velocityY = particle.velocityY * damping + forceY
+        connection.svgPath.setAttribute('d', pathD)
+        connection.svgPath.setAttribute('stroke-dasharray', String(pathLength))
+        connection.svgPath.setAttribute('stroke-dashoffset', String(pathLength * (1 - connection.progress)))
+        connection.svgPath.style.opacity = String(connection.opacity * 0.4)
+      }
+    })
 
-      particle.x += particle.velocityX
-      particle.y += particle.velocityY
+    // Atualizar elementos
+    elementsRef.current.forEach(element => {
+      element.timer += deltaSeconds
 
-      // Fade in com stagger
-      const fadeProgress = isActive
-        ? Math.min(Math.max((particle.delayTimer - particle.staggerDelay) / 0.4, 0), 1)
-        : 0
-      particle.opacity = particle.baseOpacity * fadeProgress
+      // Fade in com delay
+      if (element.timer >= element.delay && element.opacity < 0.7) {
+        element.opacity = Math.min(element.opacity + deltaSeconds * 0.8, 0.7)
+      }
 
-      // Atualizar DOM
-      const element = elementRefs.current[index]
-      if (element) {
-        element.style.transform = `translate(${particle.x}px, ${particle.y}px)`
-        element.style.opacity = String(particle.opacity)
+      // Movimento flutuante suave
+      const floatX = Math.sin(element.timer * 0.5 + element.id) * 15
+      const floatY = Math.cos(element.timer * 0.3 + element.id * 0.7) * 10
 
-        // Pulsar levemente em padrões organizados
-        const isOrdered = currentPattern !== 'chaos'
-        const scale = isOrdered ? 1 + Math.sin(particle.delayTimer * 2) * 0.15 : 1
-        element.style.width = `${particle.size * scale}px`
-        element.style.height = `${particle.size * scale}px`
+      element.x = element.targetX + floatX
+      element.y = element.targetY + floatY
+
+      // Rotação suave
+      element.rotation = Math.sin(element.timer * 0.2 + element.id) * 8
+
+      // Completar tarefas periodicamente
+      if (!element.isCompleted && element.timer > element.completionTimer) {
+        element.isCompleted = true
+        element.progress = 0
+      }
+
+      // Animar progresso do check
+      if (element.isCompleted && element.progress < 1) {
+        element.progress = Math.min(element.progress + deltaSeconds * 2, 1)
+      }
+
+      // Reset após um tempo
+      if (element.isCompleted && element.timer > element.completionTimer + 6) {
+        element.isCompleted = false
+        element.progress = 0
+        element.completionTimer = element.timer + Math.random() * 8 + 4
+      }
+
+      // Mover para nova posição ocasionalmente
+      if (Math.random() < 0.0005) {
+        const margin = 80
+        element.targetX = Math.random() * (width - margin * 2) + margin
+        element.targetY = Math.random() * (height - margin * 2) + margin
+      }
+
+      // Atualizar SVG do elemento
+      if (element.svgGroup) {
+        const g = element.svgGroup
+        g.style.opacity = String(element.opacity)
+
+        if (element.type === 'checkbox') {
+          const size = element.size
+          g.setAttribute(
+            'transform',
+            `translate(${element.x - size / 2}, ${element.y - size / 2}) rotate(${element.rotation}, ${size / 2}, ${size / 2})`
+          )
+
+          const box = g.querySelector('[data-type="box"]') as SVGRectElement
+          const check = g.querySelector('[data-type="check"]') as SVGPathElement
+
+          if (box) {
+            box.style.filter = element.isCompleted ? `drop-shadow(0 0 8px ${COLOR_VALUES[element.color]})` : 'none'
+          }
+          if (check) {
+            check.setAttribute('stroke-dashoffset', String(70 * (1 - element.progress)))
+            check.style.opacity = element.isCompleted ? '1' : '0'
+          }
+        } else if (element.type === 'card') {
+          const cardWidth = element.size * 1.6
+          const cardHeight = element.size
+          g.setAttribute(
+            'transform',
+            `translate(${element.x - cardWidth / 2}, ${element.y - cardHeight / 2}) rotate(${element.rotation}, ${cardWidth / 2}, ${cardHeight / 2})`
+          )
+
+          const miniBox = g.querySelector('[data-type="minibox"]') as SVGRectElement
+          if (miniBox) {
+            miniBox.setAttribute('fill', element.isCompleted ? COLOR_VALUES[element.color] : 'none')
+          }
+        } else if (element.type === 'progress') {
+          const barWidth = element.size * 2
+          const barHeight = 8
+          const progress = element.isCompleted ? 1 : (element.timer % 5) / 5
+
+          g.setAttribute('transform', `translate(${element.x - barWidth / 2}, ${element.y - barHeight / 2})`)
+
+          const progressBar = g.querySelector('[data-type="progress-bar"]') as SVGRectElement
+          const progressText = g.querySelector('[data-type="progress-text"]') as SVGTextElement
+
+          if (progressBar) {
+            progressBar.setAttribute('width', String(barWidth * progress))
+          }
+          if (progressText) {
+            progressText.textContent = `${Math.round(progress * 100)}%`
+          }
+        }
       }
     })
   })
 
-  // Não renderiza nada no servidor para evitar hydration mismatch
   if (!isMounted) {
     return <div className="pointer-events-none absolute inset-0 overflow-hidden" />
   }
 
   return (
     <div className="pointer-events-none absolute inset-0 overflow-hidden">
-      {particles.map((particle, index) => (
-        <div
-          key={index}
-          ref={el => {
-            elementRefs.current[index] = el
-          }}
-          className="absolute rounded-full bg-zinc-500 dark:bg-zinc-400"
-          style={{
-            width: `${particle.size}px`,
-            height: `${particle.size}px`,
-            opacity: 0,
-            transform: `translate(${particle.x}px, ${particle.y}px)`,
-            willChange: 'transform, opacity, width, height',
-            filter: 'blur(1px)',
-            boxShadow: currentPattern !== 'chaos'
-              ? '0 0 16px rgba(161, 161, 170, 0.6)'
-              : '0 0 10px rgba(161, 161, 170, 0.4)',
-            transition: 'box-shadow 0.8s ease-in-out, filter 0.8s ease-in-out',
-          }}
-        />
-      ))}
+      <svg ref={svgRef} width="100%" height="100%" className="absolute inset-0" />
     </div>
   )
 }

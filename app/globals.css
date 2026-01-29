@@ -3,8 +3,8 @@
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
 
 @theme {
-  --font-sans: var(--font-roboto);
-  --font-mono: var(--font-roboto-mono);
+  --font-sans: var(--font-space-grotesk);
+  --font-serif: var(--font-merriweather);
 
   /* Cores do tema - referenciando variáveis CSS */
   --color-background: var(--bg);
@@ -59,7 +59,16 @@
 body {
   background-color: var(--bg);
   color: var(--fg);
-  font-family: var(--font-roboto), system-ui, sans-serif;
+  font-family: var(--font-merriweather), serif;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-space-grotesk), sans-serif;
+  font-weight: 700;
 }
 
 button {
