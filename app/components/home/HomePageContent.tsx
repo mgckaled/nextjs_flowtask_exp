@@ -1,13 +1,13 @@
 'use client'
 
-import { motion } from 'motion/react'
-import Link from 'next/link'
 import {
+  BoltIcon,
   ChartBarIcon,
   UsersIcon,
-  BoltIcon,
 } from '@heroicons/react/24/outline'
-import { useSession, signIn } from 'next-auth/react'
+import { motion } from 'motion/react'
+import { signIn, useSession } from 'next-auth/react'
+import Link from 'next/link'
 import AnimatedBackground from '../shared/AnimatedBackground'
 import FeatureCard from './FeatureCard'
 
@@ -26,7 +26,7 @@ export default function HomePageContent() {
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, ease: 'easeOut' }}
-                className="text-5xl font-bold text-foreground md:text-6xl lg:text-7xl"
+                className="text-5xl font-bold text-foreground md:text-6xl lg:text-6xl"
               >
                 Gerencie Projetos com Inteligência e Simplicidade
               </motion.h1>
