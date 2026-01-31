@@ -22,6 +22,13 @@
       "when": 1769445073065,
       "tag": "0002_add_preferences",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1769871975834,
+      "tag": "0003_conscious_inertia",
+      "breakpoints": true
     }
   ]
 }
