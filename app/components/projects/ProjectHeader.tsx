@@ -3,6 +3,7 @@
 import { type Project } from "@/db/schema"
 import Link from "next/link"
 import { ArrowLeftIcon, Cog6ToothIcon, PlusIcon } from "@heroicons/react/24/outline"
+import KeyboardShortcut from "@/app/components/shared/KeyboardShortcut"
 
 type ProjectHeaderProps = {
   project: Project
@@ -47,6 +48,7 @@ export default function ProjectHeader({ project, onOpenTaskModal }: ProjectHeade
         >
           <PlusIcon className="h-4 w-4" />
           <span className="hidden sm:inline">Nova Tarefa</span>
+          <KeyboardShortcut shortcut="mod+K" className="hidden sm:inline-flex" />
         </button>
       </div>
     </div>

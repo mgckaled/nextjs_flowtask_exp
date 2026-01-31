@@ -8,6 +8,7 @@ import { createTaskSchema, updateTaskSchema, type CreateTaskData, type UpdateTas
 import { createTask, updateTask, deleteTask } from '@/app/actions/tasks'
 import { motion, AnimatePresence } from 'motion/react'
 import { XMarkIcon, TrashIcon, ArrowPathIcon } from '@heroicons/react/24/outline'
+import KeyboardShortcut from '@/app/components/shared/KeyboardShortcut'
 
 type TaskModalProps = {
   isOpen: boolean
@@ -330,11 +331,9 @@ export default function TaskModal({ isOpen, onClose, projectId, task, defaultSta
               </div>
 
               <p className="text-center text-xs text-muted-foreground">
-                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-xs">⌘</kbd>
-                {' + '}
-                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-xs">Enter</kbd>
+                <KeyboardShortcut shortcut="mod+Enter" className="bg-muted border border-border text-foreground" />
                 {' para salvar • '}
-                <kbd className="rounded border border-border bg-muted px-1.5 py-0.5 font-mono text-xs">Esc</kbd>
+                <KeyboardShortcut shortcut="Esc" className="bg-muted border border-border text-foreground" />
                 {' para fechar'}
               </p>
             </form>

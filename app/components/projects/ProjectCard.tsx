@@ -46,11 +46,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         <div className="mt-4 flex items-center gap-4 text-sm text-muted-foreground">
           <div className="flex items-center gap-1.5">
             <div className="h-4 w-4 rounded-full border-2 border-muted-foreground" />
-            <span>{totalTasks} tarefas</span>
+            <span>{totalTasks} {totalTasks === 1 ? 'tarefa' : 'tarefas'}</span>
           </div>
           <div className="flex items-center gap-1.5">
             <CheckCircleIcon className="h-4 w-4 text-green-500" />
-            <span>{completedTasks} concluídas</span>
+            <span>{completedTasks} {completedTasks === 1 ? 'concluída' : 'concluídas'}</span>
           </div>
         </div>
 
